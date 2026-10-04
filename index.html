@@ -25,18 +25,16 @@
         body { margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; height: 100vh; height: 100dvh; background: var(--bg-main); color: #334155; }
 
         /* Header */
-        #header { background: white; color: var(--red); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px 24px; z-index: 1000; border-bottom: 3px solid var(--red); }
-        .title-block { display: inline-flex; flex-direction: column; align-items: center; }
-        .logo-area h1 { margin: 0; font-size: 20px; font-weight: 800; color: var(--red); line-height: 1.2; }
-        .logo-area .subtitle { font-size: 12px; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: 0.5px; }
-        .logo-area #status { display: block; font-size: 12px; color: #64748b; margin-top: 2px; }
-        .header-note { font-size: 12px; color: var(--red); text-align: right; line-height: 1.5; max-width: 460px; }
-        .header-note a { color: var(--red); }
-        .btn-report { background: white; color: var(--red); border: 1px solid var(--red); border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; margin-top: 4px; }
-        .btn-report:hover { background: #fef2f2; }
-        #footer-note { display: none; background: white; border-top: 2px solid var(--red); color: var(--red); font-size: 11.5px; line-height: 1.4; padding: 6px 12px; align-items: center; justify-content: space-between; gap: 10px; z-index: 1000; }
+        #header { background: white; padding: 8px 20px; display: flex; flex-direction: column; align-items: center; z-index: 1000; border-bottom: 3px solid var(--red); }
+        #header h1 { margin: 0; font-size: 20px; font-weight: 800; color: var(--red); line-height: 1.2; }
+        #header .subtitle { font-size: 12px; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Lišta dole: stav dat, prohlášení, hlášení chyb */
+        #footer-note { display: flex; background: white; border-top: 2px solid var(--red); color: var(--red); font-size: 12px; line-height: 1.4; padding: 6px 20px; align-items: center; justify-content: space-between; gap: 10px; z-index: 1000; }
         #footer-note a { color: var(--red); }
-        #footer-note .btn-report { margin-top: 0; flex-shrink: 0; }
+        #status { display: block; color: #64748b; margin-bottom: 2px; }
+        .btn-report { background: white; color: var(--red); border: 1px solid var(--red); border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+        .btn-report:hover { background: #fef2f2; }
         .report-list { font-size: 13.5px; line-height: 1.6; color: #1e293b; padding-left: 20px; margin: 8px 0; }
 
         /* Toolbar & Filtry */
@@ -48,6 +46,7 @@
 
         /* Výběr data */
         .date-group { display: flex; align-items: center; gap: 6px; }
+        .date-pair { display: flex; align-items: center; gap: 6px; }
 
         .view-toggle { display: flex; background: #e2e8f0; padding: 3px; border-radius: 8px; margin-left: auto; }
         .view-btn { border: none; background: transparent; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; color: #475569; transition: all 0.2s; }
@@ -127,15 +126,14 @@
         @media (max-width: 768px) {
             #toolbar { flex-direction: column; align-items: stretch; gap: 10px; padding: 10px; }
             .filter-group { flex-wrap: wrap; }
-            .date-group { width: 100%; justify-content: space-between; }
+            .date-group { width: 100%; }
+            .date-pair { flex: 1; min-width: 210px; }
+            .date-pair input { flex: 1; min-width: 0; }
             .view-toggle { margin-left: 0; width: 100%; justify-content: center; }
             #header { padding: 6px 12px; border-bottom-width: 2px; }
-            .logo-area h1 { font-size: 17px; }
-            .logo-area .subtitle { font-size: 10.5px; }
-            #header { justify-content: center; }
-            #footer-text #status { display: block; color: #64748b; margin-bottom: 2px; }
-            .header-note { display: none; }
-            #footer-note { display: flex; }
+            #header h1 { font-size: 17px; }
+            #header .subtitle { font-size: 10.5px; }
+            #footer-note { font-size: 11.5px; padding: 6px 12px; }
             .view-btn { flex: 1; text-align: center; }
             .modal-card { max-height: 92vh; padding: 16px; border-radius: 12px 12px 0 0; }
             .modal-backdrop { padding: 0; align-items: flex-end; }
@@ -145,27 +143,14 @@
 <body>
 
     <div id="header">
-        <div class="logo-area">
-            <div class="title-block">
-                <h1>AI eDeska Praha 3</h1>
-                <div class="subtitle">neoficiální</div>
-            </div>
-            <span id="status">Připojování ke Google Drive...</span>
-        </div>
-        <div class="header-note">
-            Informace vytvořené pomocí AI z <a href="https://www.praha3.cz/eDeska/" target="_blank" rel="noopener">oficiální eDesky Prahy 3</a>.
-            Mohou obsahovat chyby, závazné je znění na oficiální desce.<br>
-            Autor: Jan Klátil ·
-            <button class="btn-report" onclick="showReportModal()">⚠️ Našli jste chybu?</button>
-        </div>
+        <h1>AI eDeska Praha 3</h1>
+        <div class="subtitle">neoficiální</div>
     </div>
 
     <div id="toolbar">
         <div class="filter-group date-group">
-            <label>Vyvěšeno od:</label>
-            <input type="date" id="dateFrom">
-            <label>do:</label>
-            <input type="date" id="dateTo">
+            <span class="date-pair"><label>Vyvěšeno od:</label> <input type="date" id="dateFrom"></span>
+            <span class="date-pair"><label>do:</label> <input type="date" id="dateTo"></span>
         </div>
 
         <div class="filter-group">
@@ -196,9 +181,9 @@
         </div>
     </div>
 
-    <!-- Na mobilu místo pravé části záhlaví -->
     <div id="footer-note">
-        <div id="footer-text">
+        <div>
+            <span id="status">Připojování ke Google Drive...</span>
             <div>AI výtah z <a href="https://www.praha3.cz/eDeska/" target="_blank" rel="noopener">oficiální eDesky</a>, může obsahovat chyby · Jan Klátil</div>
         </div>
         <button class="btn-report" onclick="showReportModal()">⚠️ Chyba?</button>
@@ -250,15 +235,6 @@
         map.addLayer(markerClusterGroup);
 
         const statusEl = document.getElementById('status');
-
-        // Na mobilu stav dat dole v liště, na počítači v záhlaví pod názvem.
-        const mobileQuery = window.matchMedia('(max-width: 768px)');
-        function placeStatus() {
-            if (mobileQuery.matches) document.getElementById('footer-text').prepend(statusEl);
-            else document.querySelector('.logo-area').appendChild(statusEl);
-        }
-        mobileQuery.addEventListener('change', placeStatus);
-        placeStatus();
 
         async function fetchAllData() {
             try {
@@ -409,7 +385,7 @@
                                     <div style="font-size:11.5px; color:#64748b; margin-bottom:4px;"><strong>Vyvěšeno:</strong> ${item.posted || '—'}</div>
                                     <p style="font-size:12px; color:#475569; margin:6px 0;">${item.summary || ''}</p>
                                     <div style="display:flex; gap:6px; margin-top:6px;">
-                                        <button class="btn-detail" style="flex:1;" onclick="showDetailModal('${item.id}')">Detailní informace ↗</button>
+                                        <button class="btn-detail" style="flex:1;" onclick="showDetailModal('${item.id}')">Detailní informace</button>
                                         <button class="btn-detail btn-secondary" style="flex:1;" onclick="showItemInList('${item.id}')">📋 Seznam</button>
                                     </div>
                                 </div>
@@ -498,7 +474,7 @@
                         </div>
                         <div class="card-actions">
                             ${hasLocation ? `<button class="btn-detail btn-secondary" onclick="zoomToItem('${item.id}')">📍 Mapa</button>` : ''}
-                            <button class="btn-detail" onclick="showDetailModal('${item.id}')">Detailní informace ↗</button>
+                            <button class="btn-detail" onclick="showDetailModal('${item.id}')">Detailní informace</button>
                         </div>
                     </div>
                 `;
