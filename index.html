@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Úřední deska Praha 3</title>
+    <title>AI eDeska Praha 3 (neoficiální)</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <!-- Leaflet MarkerCluster CSS -->
@@ -18,15 +18,26 @@
             --dark: #0f172a;
             --gray-border: #cbd5e1;
             --gray-text: #64748b;
+            --red: #c8102e;
         }
 
         * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; height: 100vh; background: var(--bg-main); color: #334155; }
+        body { margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; height: 100vh; height: 100dvh; background: var(--bg-main); color: #334155; }
 
         /* Header */
-        #header { background: #1e293b; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-        .logo-area h1 { margin: 0; font-size: 18px; font-weight: 700; color: #f8fafc; }
-        .logo-area span { font-size: 12px; color: #94a3b8; }
+        #header { background: white; color: var(--red); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px 24px; z-index: 1000; border-bottom: 3px solid var(--red); }
+        .title-block { display: inline-flex; flex-direction: column; align-items: center; }
+        .logo-area h1 { margin: 0; font-size: 20px; font-weight: 800; color: var(--red); line-height: 1.2; }
+        .logo-area .subtitle { font-size: 12px; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: 0.5px; }
+        .logo-area #status { display: block; font-size: 12px; color: #64748b; margin-top: 2px; }
+        .header-note { font-size: 12px; color: var(--red); text-align: right; line-height: 1.5; max-width: 460px; }
+        .header-note a { color: var(--red); }
+        .btn-report { background: white; color: var(--red); border: 1px solid var(--red); border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; margin-top: 4px; }
+        .btn-report:hover { background: #fef2f2; }
+        #footer-note { display: none; background: white; border-top: 2px solid var(--red); color: var(--red); font-size: 11.5px; line-height: 1.4; padding: 6px 12px; align-items: center; justify-content: space-between; gap: 10px; z-index: 1000; }
+        #footer-note a { color: var(--red); }
+        #footer-note .btn-report { margin-top: 0; flex-shrink: 0; }
+        .report-list { font-size: 13.5px; line-height: 1.6; color: #1e293b; padding-left: 20px; margin: 8px 0; }
 
         /* Toolbar & Filtry */
         #toolbar { background: white; border-bottom: 1px solid var(--gray-border); padding: 10px 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; z-index: 999; }
@@ -118,6 +129,13 @@
             .filter-group { flex-wrap: wrap; }
             .date-group { width: 100%; justify-content: space-between; }
             .view-toggle { margin-left: 0; width: 100%; justify-content: center; }
+            #header { padding: 6px 12px; border-bottom-width: 2px; }
+            .logo-area h1 { font-size: 17px; }
+            .logo-area .subtitle { font-size: 10.5px; }
+            #header { justify-content: center; }
+            #footer-text #status { display: block; color: #64748b; margin-bottom: 2px; }
+            .header-note { display: none; }
+            #footer-note { display: flex; }
             .view-btn { flex: 1; text-align: center; }
             .modal-card { max-height: 92vh; padding: 16px; border-radius: 12px 12px 0 0; }
             .modal-backdrop { padding: 0; align-items: flex-end; }
@@ -128,8 +146,17 @@
 
     <div id="header">
         <div class="logo-area">
-            <h1>Úřední deska Praha 3</h1>
+            <div class="title-block">
+                <h1>AI eDeska Praha 3</h1>
+                <div class="subtitle">neoficiální</div>
+            </div>
             <span id="status">Připojování ke Google Drive...</span>
+        </div>
+        <div class="header-note">
+            Informace vytvořené pomocí AI z <a href="https://www.praha3.cz/eDeska/" target="_blank" rel="noopener">oficiální eDesky Prahy 3</a>.
+            Mohou obsahovat chyby, závazné je znění na oficiální desce.<br>
+            Autor: Jan Klátil ·
+            <button class="btn-report" onclick="showReportModal()">⚠️ Našli jste chybu?</button>
         </div>
     </div>
 
@@ -167,6 +194,14 @@
         <div id="list-view">
             <div class="cards-grid" id="cardsContainer"></div>
         </div>
+    </div>
+
+    <!-- Na mobilu místo pravé části záhlaví -->
+    <div id="footer-note">
+        <div id="footer-text">
+            <div>AI výtah z <a href="https://www.praha3.cz/eDeska/" target="_blank" rel="noopener">oficiální eDesky</a>, může obsahovat chyby · Jan Klátil</div>
+        </div>
+        <button class="btn-report" onclick="showReportModal()">⚠️ Chyba?</button>
     </div>
 
     <!-- Detail Modal Window -->
@@ -215,6 +250,15 @@
         map.addLayer(markerClusterGroup);
 
         const statusEl = document.getElementById('status');
+
+        // Na mobilu stav dat dole v liště, na počítači v záhlaví pod názvem.
+        const mobileQuery = window.matchMedia('(max-width: 768px)');
+        function placeStatus() {
+            if (mobileQuery.matches) document.getElementById('footer-text').prepend(statusEl);
+            else document.querySelector('.logo-area').appendChild(statusEl);
+        }
+        mobileQuery.addEventListener('change', placeStatus);
+        placeStatus();
 
         async function fetchAllData() {
             try {
@@ -365,8 +409,8 @@
                                     <div style="font-size:11.5px; color:#64748b; margin-bottom:4px;"><strong>Vyvěšeno:</strong> ${item.posted || '—'}</div>
                                     <p style="font-size:12px; color:#475569; margin:6px 0;">${item.summary || ''}</p>
                                     <div style="display:flex; gap:6px; margin-top:6px;">
-                                        <button class="btn-detail" style="flex:1;" onclick="showDetailModal('${item.id}')">Detail ↗</button>
-                                        <button class="btn-detail btn-secondary" style="flex:1;" onclick="showItemInList('${item.id}')">📋 V seznamu</button>
+                                        <button class="btn-detail" style="flex:1;" onclick="showDetailModal('${item.id}')">Detailní informace ↗</button>
+                                        <button class="btn-detail btn-secondary" style="flex:1;" onclick="showItemInList('${item.id}')">📋 Seznam</button>
                                     </div>
                                 </div>
                             `;
@@ -426,7 +470,6 @@
             filteredItems.forEach(item => {
                 const hasLocation = item.places && item.places.length > 0 && item.places.some(p => p.point);
                 const catColor = categoryColorMap[item.category] || '#0369a1';
-                const edeskyUrl = getEdeskyUrl(item);
 
                 const card = document.createElement('div');
                 card.className = 'card';
@@ -454,8 +497,7 @@
                             ${item.caseRefs && item.caseRefs.length > 0 ? `<strong>ČJ/Spis:</strong> ${item.caseRefs.join(', ')}` : ''}
                         </div>
                         <div class="card-actions">
-                            ${edeskyUrl ? `<a href="${edeskyUrl}" target="_blank" rel="noopener" class="btn-detail btn-edeska">🔗 Historie eDesky.cz</a>` : ''}
-                            ${hasLocation ? `<button class="btn-detail btn-secondary" onclick="zoomToItem('${item.id}')">📍 Ukázat na mapě</button>` : ''}
+                            ${hasLocation ? `<button class="btn-detail btn-secondary" onclick="zoomToItem('${item.id}')">📍 Mapa</button>` : ''}
                             <button class="btn-detail" onclick="showDetailModal('${item.id}')">Detailní informace ↗</button>
                         </div>
                     </div>
@@ -518,17 +560,16 @@
 
                 <div style="margin: 14px 0; font-size: 13px; display: flex; flex-direction: column; gap: 6px; background:#f8fafc; padding:10px; border-radius:8px;">
                     <div><strong>Spisové značky / ČJ:</strong> ${caseRefsHtml}</div>
-                    <div><strong>Důležitost:</strong> ${item.importance ?? '—'}</div>
-                    <div><strong>Osobní údaj:</strong> ${item.personalMatter ? 'Ano' : 'Ne'}</div>
                     <div><strong>Rozsah dotčení:</strong> ${item.scope || '—'}</div>
                 </div>
 
                 <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; align-items: center;">
-                    <button id="shareBtn-${item.id}" class="btn-detail btn-share" style="padding: 10px 16px; font-size: 13px;" onclick="shareItem('${item.id}')">📋 Sdílet odkaz</button>
-                    ${edeskyUrl ? `<a href="${edeskyUrl}" target="_blank" rel="noopener" class="btn-detail btn-edeska" style="padding: 10px 16px; font-size: 13px;">🔗 Historie eDesky.cz</a>` : ''}
-                    ${hasLocation ? `<button class="btn-detail btn-secondary" style="padding: 10px 16px; font-size: 13px;" onclick="closeModal(); zoomToItem('${item.id}');">📍 Ukázat na mapě</button>` : ''}
-                    <button class="btn-detail btn-secondary" style="padding: 10px 16px; font-size: 13px;" onclick="showItemInList('${item.id}')">📋 Zobrazit v seznamu</button>
-                    ${item.url ? `<a href="${item.url}" target="_blank" rel="noopener" class="btn-detail" style="padding: 10px 16px; font-size: 13px; background: #2563eb; color: white;">Otevřít na eDesce MČ Praha 3 ↗</a>` : ''}
+                    <button class="btn-detail btn-secondary" style="padding: 10px 16px; font-size: 13px; margin-right: auto; color: var(--red);" onclick="showReportModal('${item.id}')">⚠️ Nahlásit</button>
+                    <button id="shareBtn-${item.id}" class="btn-detail btn-share" style="padding: 10px 16px; font-size: 13px;" onclick="shareItem('${item.id}')">📋 Sdílet</button>
+                    ${edeskyUrl ? `<a href="${edeskyUrl}" target="_blank" rel="noopener" class="btn-detail btn-edeska" style="padding: 10px 16px; font-size: 13px;">🔗 Historie</a>` : ''}
+                    ${hasLocation ? `<button class="btn-detail btn-secondary" style="padding: 10px 16px; font-size: 13px;" onclick="closeModal(); zoomToItem('${item.id}');">📍 Mapa</button>` : ''}
+                    <button class="btn-detail btn-secondary" style="padding: 10px 16px; font-size: 13px;" onclick="showItemInList('${item.id}')">📋 Seznam</button>
+                    ${item.url ? `<a href="${item.url}" target="_blank" rel="noopener" class="btn-detail" style="padding: 10px 16px; font-size: 13px; background: #2563eb; color: white;">Oficiální eDeska P3 ↗</a>` : ''}
                 </div>
             `;
 
@@ -553,6 +594,33 @@
             }).catch(() => {
                 prompt('Zkopírujte odkaz:', url);
             });
+        }
+
+        const FB_PAGE_URL = 'https://www.facebook.com/profile.php?id=61594706473011';
+
+        // Hlášení chyb: zprávou na stránku na Facebooku; u konkrétní položky přidá odkaz, který lze do zprávy vložit.
+        function showReportModal(itemId) {
+            const item = itemId ? allItems.find(i => i.id === itemId) : null;
+            const itemLink = item ? window.location.origin + window.location.pathname + '#doc-' + item.id : '';
+            document.getElementById('modalContent').innerHTML = `
+                <h2 style="margin: 0 0 10px 0; font-size: 18px; color: var(--red); padding-right: 30px;">⚠️ Nahlásit problém</h2>
+                <p style="font-size: 13.5px; line-height: 1.6; margin: 0;">Texty na této stránce vytváří AI a může se splést. Napište mi prosím, když:</p>
+                <ul class="report-list">
+                    <li>je u dokumentu chybné shrnutí, místo na mapě nebo termín,</li>
+                    <li>na stránce něco nefunguje,</li>
+                    <li>zveřejněná informace obsahuje osobní údaje nebo jinak porušuje GDPR – takovou položku co nejdřív stáhnu.</li>
+                </ul>
+                ${item ? `
+                <p style="font-size: 13px; margin: 12px 0 6px 0;">Do zprávy prosím vložte odkaz na dokument:</p>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" readonly value="${itemLink}" style="flex: 1; font-size: 12px;" onclick="this.select()">
+                    <button class="btn-detail btn-secondary" onclick="navigator.clipboard.writeText('${itemLink}').then(() => this.textContent = '✓ Zkopírováno')">Kopírovat</button>
+                </div>` : ''}
+                <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                    <a href="${FB_PAGE_URL}" target="_blank" rel="noopener" class="btn-detail" style="padding: 10px 16px; font-size: 13px; background: #1877f2; color: white; border-color: #1877f2;">Napsat zprávu na Facebooku ↗</a>
+                </div>
+            `;
+            document.getElementById('detailModal').classList.add('open');
         }
 
         function closeModal() {
@@ -644,7 +712,7 @@
             } catch (err) {
                 console.error(err);
                 statusEl.textContent = `Chyba: ${err.message}`;
-                statusEl.style.color = '#f87171';
+                statusEl.style.color = 'var(--red)';
             }
         }
 
